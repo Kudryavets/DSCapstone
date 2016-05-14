@@ -2,21 +2,14 @@ require(doParallel)
 
 process.text <- function(text, profanity.vec, verbose=F) {
     
-    if (verbose) cat("\n", '# Удаляем <>                                       ')
+    if (verbose) cat('\n', '# Удаляем <>\n', text)
     text <- gsub("[<>]+","",text)
-    
-    if (verbose) cat("\r", '# Чистим от плохих слов, заменяем на <profanity>   ')
-    profanity.vec[1] = paste(' +',profanity.vec[1], collapse = '')
-    profanity.vec[length(profanity.vec)] = paste(profanity.vec[length(profanity.vec)],'+')
-    profanity.search <- gregexpr(paste(profanity.vec,collapse = ' +| +'), tolower(text))
-    regmatches(text, profanity.search) <- '<profanity>'
-    text <- gsub("<profanity>[a-zA-Z]+", '<profanity>', text)
     
     ############################################ Удаляем повторяющиеся символы (>3 приводим к 2)
     
     ############################################ Разбираемся с -, '
     
-    if (verbose) cat("\r", '# Вытаскиваем конструкции в () в отдельные документы')
+    if (verbose) cat('\n', '# Вытаскиваем конструкции в () в отдельные документы\n', text)
     new.phrases.search <- gregexpr("\\(([[:graph:]]+\\s)+[[:graph:]]+\\)", text)
     new.phrases <- unlist(regmatches(text, new.phrases.search))
     text <- gsub("\\(([[:graph:]]+\\s)+[[:graph:]]+\\)","", text)
@@ -24,7 +17,7 @@ process.text <- function(text, profanity.vec, verbose=F) {
     
     ############################################# 8. Ищем общеупотребительные названия и имена заключаем их в <>
     
-    if (verbose) cat("\r", '# Ищем special_words и заменяем на <special words>   ')
+    if (verbose) cat('\n', '# Ищем special_words и заменяем на <special words>\n', text)
     #     emails                     <email>
     text <- gsub("[[:graph:]]+@[a-z]+\\.[a-z]+",'<email>', text)
     
@@ -60,47 +53,56 @@ process.text <- function(text, profanity.vec, verbose=F) {
     #     оставшиеся цифры           <othdigit>
     text <- gsub('[[:digit:]]+\\.?[[:digit:]]+', '<othdigit>', text)
     
-    #     I                          <ich>
-    text <- gsub('(I)([[:punct:][:blank:]])', '<ich>\\2', text)
-    
     # Replace [?!;.]+ with [.]
     text <- gsub("[?!;.]+",".",text)
     
-    ############################################## ToDo - классификатор конца преддложения, заменяем на <end>, используем \\1,\\2, уделяем внимание Mr. Dr. и пр
+    # Replace [Mr.,Ms,Mrs,Dr]+ with <mr>,<mrs>,<ms>,<dr>
+    text <- gsub('Mr\\.|mr\\.', '<mr>', text)
+    text <- gsub('Mrs\\.|mrs\\.', '<mrs>', text)
+    text <- gsub('Ms\\.|ms\\.', '<ms>', text)
+    text <- gsub('Dr\\.|dr\\.', '<dr>', text)
     
-    if (verbose) cat("\r", '# Разбиваем документы по фразам                               ')
+    #     I                          <ich>
+    text <- gsub('(I)([[:punct:][:blank:]])', '<ich>\\2', text)
+    
+    if (verbose) cat('\n', '# Разбиваем документы по фразам\n', text)
     text <- unlist(strsplit(text, "\\.\\s+"))
     
-    if (verbose) cat("\r", "# Удаляем всю оставшуюся пунктуацию, кроме '                  ")
-    text <- gsub("[-»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…-）]+"," ",text)
+    if (verbose) cat('\n', "# Удаляем всю оставшуюся пунктуацию, кроме '\n", text)
+    text <- gsub("[»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," ",text)
     text <- gsub("\\.","",text)
     text <- gsub("[{}]+|\"|\\[+|\\]+\""," ",text)
     
-    if (verbose) cat("\r", '# Удаляем дублирующиеся пробелы в начале и в конце предложения')
-    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", text)     
+    if (verbose) cat('\n', '# Удаляем неанглийские слова\n', text)
+    text <- gsub('[—-）]+', '<foreign>', text)
     
-    if (verbose) cat("\r", '# Удаляем все оставшиеся странные знаки                       ')
+    if (verbose) cat('\n', '# Удаляем все оставшиеся странные знаки\n', text)
     text <- iconv(text, "latin1", "ASCII", sub="")
     
-    if (verbose) cat("\r", '# Удаляем неанглийские слова                                  ')
-    text <- gsub('[^[:alpha:][:punct:][:blank:]]', '<foreign>', text)
-    text <- gsub('((<foreign>)+ )+', '<foreign> ', text)
-    
-    if (verbose) cat("\r", '# Удаляем лишние пробелы в конце предложения и в начале тоже   ')
+    if (verbose) cat('\n', '# Удаляем пробелы в конце и в начале предложения, tolower\n', text)
     text <- gsub("[ \t\r\n\f]+"," ", text)
-    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", text)
+    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", tolower(text))
     
-    if (verbose) cat("\r", '# Удаляем все что содержит одно, два слова или ничего          ')
-    text <- text[sapply(strsplit(text, "\\s+"), length) > 2]
-    
-    if (verbose) cat("\r", '# Приводим к нижнему регистру, оставляем только уникальные фразы')
-    text <- unique(tolower(text))
-    
-    if (verbose) cat("\r", '# проставляем начало и конец предложения                         ')
+    if (verbose) cat('\n', '# проставляем начало и конец предложения\n', text)
     text <- gsub("^","<BOS> ", text)
     text <- gsub("$"," <EOS>", text)
     
-    if (verbose) cat("\r", '# Возвращаем текст                                               ')
+    if (verbose) cat('\n', '# Чистим от плохих слов, заменяем на <profanity>\n', text)
+    profanity.vec[1] = paste(' +',profanity.vec[1], collapse = '')
+    profanity.vec[length(profanity.vec)] = paste(profanity.vec[length(profanity.vec)],'+')
+    profanity.search <- gregexpr(paste(profanity.vec,collapse = ' +| +'), tolower(text))
+    regmatches(text, profanity.search) <- ' <profanity> '
+    
+    if (verbose) cat('\n', '# чистим от повторений\n', text)
+    text <- gsub('((<[a-z]+>)+ )+', '\\1', text)
+    
+    if (verbose) cat('\n', '# Удаляем все что содержит одно, два слова или ничего\n', text)
+    text <- text[sapply(strsplit(text, "\\s+"), length) > 4]
+    
+    if (verbose) cat('\n', '# Оставляем только уникальные фразы\n', text)
+    text <- unique(text)
+    
+    if (verbose) cat('\n', '# Возвращаем текст\n', text)
     return(text)
 }
 

@@ -1,15 +1,15 @@
 setwd("./Tasks/DSCapstone/")
-source("project/main/text.processing.R")
-source("project/main/meta.model.R")
+source("TSafer/main/text.processing.R")
+source("TSafer/main/meta.model.R")
 
-blogs <- readRDS("./data/raw_hashed/blogs.rds")
-profanity.vec <- readRDS('project/main/sources/profanity.rds')
+blogs <- readRDS("TSafer/data/blogs.rds")
+profanity.vec <- readRDS('TSafer/main/sources/profanity.rds')
 
 sample <- sample(blogs,1)
 sample.processed <- process.text.par(sample,profanity.vec,8)
 
-names <- meta.model.learn(sample.processed,4,"./project/main/sources/")
-names <- meta.model.load("./project/")
+names <- meta.model.learn(sample.processed,4,"./TSafer/main/sources/")
+names <- meta.model.load("./TSafer/")
 
 
 

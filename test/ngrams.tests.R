@@ -1,5 +1,5 @@
 require(RUnit)
-source("./project/main/ngrams.R")
+source("TSafer/main/ngrams.R")
 
 ngrams.tests <- function() {
     
