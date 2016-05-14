@@ -22,13 +22,13 @@ process.text <- function(text, profanity.vec, verbose=F) {
     text <- gsub("[[:graph:]]+@[a-z]+\\.[a-z]+",'<email>', text)
     
     #     social network user        <user> 
-    text <- gsub("@[[:graph:]]+",' <user>', text)
+    text <- gsub("@[A-Za-z_]+",' <user>', text)
     
     #     порядковое числительное    <ordinal>
     text <- gsub('[0-9]+(nd|st|rd|th)','<ordinal>', text)
     
     #     hash-tags                  <hashtag>
-    text <- gsub('#[A-Za-z]+','<hashtag>', text)
+    text <- gsub('#[A-Za-z_]+','<hashtag>', text)
     
     #     web-site references        <link>
     text <- gsub('(http|www)[[:graph:]]+[A-Za-z]+', '<link>', text)
@@ -65,8 +65,15 @@ process.text <- function(text, profanity.vec, verbose=F) {
     #     I                          <ich>
     text <- gsub('(I)([[:punct:][:blank:]])', '<ich>\\2', text)
     
-    if (verbose) cat('\n', '# Разбиваем документы по фразам\n', text)
-    text <- unlist(strsplit(text, "\\.\\s+"))
+    if (verbose) cat('\n', '# Разбиваем документы по фразам, tolower\n', text)
+    text <- unlist(strsplit(tolower(text), "\\.\\s+"))
+    
+    text <- gsub("'s", ' is', text)
+    text <- gsub("'re", ' are', text)
+    text <- gsub("'d", ' would', text)
+    text <- gsub("'ve", ' have', text)
+    text <- gsub("n't", ' not', text)
+    text <- gsub("'m", ' am', text)
     
     if (verbose) cat('\n', "# Удаляем всю оставшуюся пунктуацию, кроме '\n", text)
     text <- gsub("[»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," ",text)
@@ -79,9 +86,9 @@ process.text <- function(text, profanity.vec, verbose=F) {
     if (verbose) cat('\n', '# Удаляем все оставшиеся странные знаки\n', text)
     text <- iconv(text, "latin1", "ASCII", sub="")
     
-    if (verbose) cat('\n', '# Удаляем пробелы в конце и в начале предложения, tolower\n', text)
+    if (verbose) cat('\n', '# Удаляем пробелы в конце и в начале предложения \n', text)
     text <- gsub("[ \t\r\n\f]+"," ", text)
-    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", tolower(text))
+    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", text)
     
     if (verbose) cat('\n', '# проставляем начало и конец предложения\n', text)
     text <- gsub("^","<BOS> ", text)
@@ -94,7 +101,8 @@ process.text <- function(text, profanity.vec, verbose=F) {
     regmatches(text, profanity.search) <- ' <profanity> '
     
     if (verbose) cat('\n', '# чистим от повторений\n', text)
-    text <- gsub('((<[a-z]+>)+ )+', '\\1', text)
+    text <- gsub('((<[a-z]+>)+ )\\1+', '\\1', text)
+    text <- gsub('(>)[a-z]+|[a-z]+(<)', '\\1', text)
     
     if (verbose) cat('\n', '# Удаляем все что содержит одно, два слова или ничего\n', text)
     text <- text[sapply(strsplit(text, "\\s+"), length) > 4]
