@@ -20,6 +20,9 @@
 # How can you use backoff models to estimate the probability of unobserved n-grams?
 # Can you think of simple ways to "smooth" the probabilities (think about giving all n-grams a non-zero probability even if they aren't observed in the data) ?
 # Build a predictive model based on the previous data modeling steps - you may combine the models in any way you think is appropriate.
+# Evaluate the model for efficiency and accuracy - use timing software to evaluate the computational complexity of your model. Evaluate the model accuracy using different metrics like perplexity, accuracy at the first word, second word, and third word.
+# Create a data product to show off your prediction algorithm You should create a Shiny app that accepts an n-gram and predicts the next word.
+
 
 Can you think of any other data sources that might help you in this project?  WSJ kaggle
 Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?
@@ -29,7 +32,6 @@ How many parameters do you need (i.e. how big is n in your n-gram model)?
 Build a model to handle unseen n-grams - in some cases people will want to type a combination of words that does not appear in the corpora. Build a model to handle cases where a particular n-gram isn't observed.
 
 # Tasks to accomplish
-Evaluate the model for efficiency and accuracy - use timing software to evaluate the computational complexity of your model. Evaluate the model accuracy using different metrics like perplexity, accuracy at the first word, second word, and third word.
 
 # Questions to consider
 How does the model perform for different choices of the parameters and size of the model? 
@@ -46,9 +48,6 @@ What are ways in which the n-gram model may be inefficient?
 What are the most commonly missed n-grams? Can you think of a reason why they would be missed and fix that? 
 What are some other things that other people have tried to improve their model? 
 Can you estimate how uncertain you are about the words you are predicting? 
-
-# Tasks to accomplish
-Create a data product to show off your prediction algorithm You should create a Shiny app that accepts an n-gram and predicts the next word.
 
 # Questions to consider
 What are the most interesting ways you could show off your algorithm?

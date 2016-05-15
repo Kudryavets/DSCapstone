@@ -33,11 +33,11 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
         return()
     }
     
-    range = if (level=='highest') list(1:(N-1)) else list(2:(N-1))
+    range = if (level=='highest') -N else c(-1,-N)
                                                 
     model[, ':=' (
         first = sapply(
-            lapply(range, function(x) lapply(split.words, "[", x))[[1]], 
+            lapply(split.words, "[", range), 
             function(x) paste(x, collapse = " ")),
         last = sapply(split.words, "[", N),
         Ngrams.words = NULL
@@ -90,13 +90,4 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
 
 model.get.row <- function(model, NGram) {
     return(model[first==NGram])
-}
-
-model.evaluate <- function(model, corpus) {
-    time
-    accuracy1
-    accuracy2
-    accuracy3
-    accuracyUnknown
-    perplexity
 }
