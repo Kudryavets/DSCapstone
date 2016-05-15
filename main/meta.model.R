@@ -1,5 +1,6 @@
 source("TSafer/main/ngrams.R")
 source("TSafer/main/model.R")
+source("TSafer/main/text.processing.R")
 
 meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=0) {
     result = list()
@@ -54,7 +55,7 @@ meta.model.predict <- function(sentence, names, preds.num) {
         split.words = unlist(strsplit(text,' '))
         len <- length(split.words)
         offset = if (ngram.rang == 1) 0 else ngram.rang - 2
-        Ngram <- paste(split.words[(len-offset):len], collapse=" ")
+        Ngram <- if (len>1) paste(split.words[(len-offset):len], collapse=" ") else split.words
         
         model.name <- names[grepl(ngram.rang,names)]
         model.rows <- model.get.row(get(model.name), Ngram)
@@ -97,6 +98,78 @@ meta.model.predict <- function(sentence, names, preds.num) {
     }
     
     preds <- compute.Ngram.prob(highest.ngram,sentence)
-    prep.preds <- sort(preds, decreasing=T)[1:preds.num]
+    prep.preds <- if (is.finite(preds.num)) sort(preds, decreasing=T)[1:preds.num] else sort(preds, decreasing=T)
+
     return(prep.preds)
+}
+
+meta.model.evaluate.size <- function(model_names, unit="MB") {
+    
+    print("# model size")
+    size.in.bytes = 0
+    size.in.nrows = 0
+    for (name in model_names) {
+        size.in.bytes = size.in.bytes + object.size(get(name))
+        size.in.nrows = size.in.nrows + nrow(get(name))
+    }
+    cat('\nSize in mb: ', format(size.in.bytes, units=unit))
+    cat('\nSize in rows: ', size.in.nrows)
+}
+
+meta.model.evaluate.speed <- function(model_names, request, N.requests=1000) {
+    print("# requests time")
+    print(system.time( for (i in 1:N.requests) {
+        meta.model.predict(request, model_names, 1)
+    }))
+}
+
+meta.model.evaluate.accuracy <- function(model_names, test.corpus, highest.ngram=3, 
+                                         N.preds=5, penalty=1, cores=8) {
+    for (i in 1:highest.ngram+1) {
+        ngrams.split <- strsplit(Ngrams.build.par(test.corpus, i, cores),' ')
+        queries <- sapply(
+            lapply(ngrams.split,'[',-i), 
+            function(x) paste(x, collapse=' ')
+        )
+        preds.verif <- sapply(ngrams.split,'[',i)
+        
+        accuracy.precise.acc <- 0
+        accuracy.prob.acc <- 0
+        accuracy.order.acc <- 0
+        scope <- length(queries)
+        for (j in 1:scope) {
+            pred = meta.model.predict(queries[j], model_names, N.preds)
+            verif = preds.verif[j]
+            accuracy.precise.acc <- accuracy.precise.acc + (names(pred[1]) == verif)
+            if (is.na(pred[verif])) {
+                accuracy.order.acc <- accuracy.order.acc + N.preds + penalty
+            } else {
+                accuracy.prob.acc <- accuracy.prob.acc + pred[[verif]]
+                accuracy.order.acc <- accuracy.order.acc + which(names(pred) == verif)
+            } 
+        }
+        print(sprintf("%d accuracy.precise: %.6f", i-1, accuracy.precise.acc/scope))
+        print(sprintf("%d accuracy.prob:  %.6f", i-1, accuracy.prob.acc/scope))
+        print(sprintf("%d accuracy.order:  %.2f", i-1, accuracy.order.acc/scope))
+    } 
+}
+
+meta.model.evaluate.perplexity <- function(model_names, test.corpus, penalty = 10^-5, cores=8) {
+    perplexity.acc <- 0
+    scope <- length(test.corpus)
+    
+    for (sentence in test.corpus) {
+        sent.perplexity.acc <- 1
+        sentence.split <- unlist(strsplit(sentence,' '))
+        sentence.scope <- length(sentence.split)
+        for (i in 2:sentence.scope) {
+            preds.verif <- sentence.split[[i]]
+            query <- paste(sentence.split[1:(i-1)], sep=" ")
+            preds <- meta.model.predict(query, model_names, Inf)
+            prob <- if (is.na(preds[preds.verif])) penalty else preds[[preds.verif]]
+            sent.perplexity.acc <- sent.perplexity.acc * prob
+        }
+        perplexity.acc <- perplexity.acc + sent.perplexity.acc^(-1/(sentence.scope-1))
+    }
+    print(sprintf("perplexity per word %.2f", perplexity.acc/scope))
 }

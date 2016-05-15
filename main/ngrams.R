@@ -3,7 +3,7 @@ require(doParallel)
 
 Ngrams.build <- function(text, N) NGramTokenizer(text, Weka_control(min = N, max = N))
 
-Ngrams.build.par <- function(text, N, cores) {
+Ngrams.build.par <- function(text, N, cores=8) {
     
     parts = ceiling(length(text)/200000)
     scope = if (parts>cores) parts else cores
