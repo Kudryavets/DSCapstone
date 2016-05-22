@@ -1,3 +1,39 @@
+Can you think of any other data sources that might help you in this project?  WSJ kaggle
+Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?
+How can you efficiently store an n-gram model (think Markov Chains)?
+How can you use the knowledge about word frequencies to make your model smaller and more efficient?
+How many parameters do you need (i.e. how big is n in your n-gram model)?
+Build a model to handle unseen n-grams - in some cases people will want to type a combination of words that does not appear in the corpora. Build a model to handle cases where a particular n-gram isn't observed.
+
+Questions to consider
+How does the model perform for different choices of the parameters and size of the model? 
+How much does the model slow down for the performance you gain?
+Does perplexity correlate with the other measures of accuracy?
+Can you reduce the size of the model (number of parameters) without reducing performance?
+
+Tasks to accomplish
+Evaluate your new predictions on both accuracy and efficiency. 
+
+Questions to consider
+What are ways in which the n-gram model may be inefficient?
+What are the most commonly missed n-grams? Can you think of a reason why they would be missed and fix that? 
+What are some other things that other people have tried to improve their model? 
+Can you estimate how uncertain you are about the words you are predicting? 
+
+Questions to consider
+How should you document the use of your data product (separately from how you created it) so that others can rapidly deploy your algorithm?
+
+Tasks to accomplish
+Create a slide deck promoting your product. Write 5 slides using RStudio Presenter explaining your product and why it is awesome!
+
+
+
+
+
+
+
+
+
 # Tasks to accomplish
 # Obtaining the data - Can you download the data and load/manipulate it in R?
 # Familiarizing yourself with NLP and text mining - Learn about the basics of natural language processing and how it relates to the data science process you have learned in the Data Science Specialization.
@@ -22,42 +58,8 @@
 # Build a predictive model based on the previous data modeling steps - you may combine the models in any way you think is appropriate.
 # Evaluate the model for efficiency and accuracy - use timing software to evaluate the computational complexity of your model. Evaluate the model accuracy using different metrics like perplexity, accuracy at the first word, second word, and third word.
 # Create a data product to show off your prediction algorithm You should create a Shiny app that accepts an n-gram and predicts the next word.
-
-
-Can you think of any other data sources that might help you in this project?  WSJ kaggle
-Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?
-How can you efficiently store an n-gram model (think Markov Chains)?
-How can you use the knowledge about word frequencies to make your model smaller and more efficient?
-How many parameters do you need (i.e. how big is n in your n-gram model)?
-Build a model to handle unseen n-grams - in some cases people will want to type a combination of words that does not appear in the corpora. Build a model to handle cases where a particular n-gram isn't observed.
-
-# Tasks to accomplish
-
-# Questions to consider
-How does the model perform for different choices of the parameters and size of the model? 
-How much does the model slow down for the performance you gain?
-Does perplexity correlate with the other measures of accuracy?
-Can you reduce the size of the model (number of parameters) without reducing performance?
-
-# Tasks to accomplish
-Explore new models and data to improve your predictive model.
-Evaluate your new predictions on both accuracy and efficiency. 
-
-# Questions to consider
-What are ways in which the n-gram model may be inefficient?
-What are the most commonly missed n-grams? Can you think of a reason why they would be missed and fix that? 
-What are some other things that other people have tried to improve their model? 
-Can you estimate how uncertain you are about the words you are predicting? 
-
-# Questions to consider
-What are the most interesting ways you could show off your algorithm?
-Are there any data visualizations you think might be helpful (look at the Swiftkey data dashboard if you have it loaded on your phone)?
-How should you document the use of your data product (separately from how you created it) so that others can rapidly deploy your algorithm?
-
-# Tasks to accomplish
-Create a slide deck promoting your product. Write 5 slides using RStudio Presenter explaining your product and why it is awesome!
-    
-    # Questions to consider
-    How can you briefly explain how your predictive model works?
-How can you succinctly quantitatively summarize the performance of your prediction algorithm?
-How can you show the user how the product works?
+# What are the most interesting ways you could show off your algorithm?
+# Are there any data visualizations you think might be helpful (look at the Swiftkey data dashboard if you have it loaded on your phone)?
+# How can you briefly explain how your predictive model works?
+# How can you succinctly quantitatively summarize the performance of your prediction algorithm?
+# How can you show the user how the product works?

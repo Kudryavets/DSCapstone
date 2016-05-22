@@ -1,5 +1,5 @@
 require(RUnit)
-source("TSafer/main/text.processing.R")
+source("main/text.processing.R")
 
 text.processing.tests <- function() {
     
@@ -36,9 +36,9 @@ text.processing.tests <- function() {
                            "<BOS> you know this staff man do not wanna live after <EOS>"
                            )
     
-    profanity.vec <- readRDS('TSafer/main/sources/profanity.rds')
+    profanity.vec <- c("ssdfs", "shit")
     
     text.processing.result <- process.text(text.corpus,profanity.vec,verbose=F)
     
-    checkEquals(text.processing.result, text.processing.verif)
+    print(sprintf("text.processing status: %s", checkEquals(text.processing.result, text.processing.verif)))
 }

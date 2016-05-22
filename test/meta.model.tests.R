@@ -1,5 +1,5 @@
 require(RUnit)
-source("TSafer/main/meta.model.R")
+source("main/meta.model.R")
 
 meta.model.tests <- function(){
     
@@ -15,8 +15,8 @@ meta.model.tests <- function(){
                 "3gram one occurrence test7",
                 "of test8", "steven spielberg test9")
     
-    names.learn <- meta.model.learn(corpus, 4,"TSafer/test/sources/")
-    names.load <- meta.model.load("TSafer/test/sources/")
+    names.learn <- meta.model.learn(corpus, 4,"test/sources/")
+    names.load <- meta.model.load("test/sources/")
     names.test <- c("N1gram.model", "N2gram.model", "N3gram.model", "N4gram.model")
     
     print(sprintf("names.learn status: %s", checkEquals(names.learn, names.test)))

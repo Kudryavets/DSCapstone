@@ -1,6 +1,6 @@
-source("TSafer/main/ngrams.R")
-source("TSafer/main/model.R")
-source("TSafer/main/text.processing.R")
+source("main/ngrams.R")
+source("main/model.R")
+source("main/text.processing.R")
 
 meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=0) {
     result = list()

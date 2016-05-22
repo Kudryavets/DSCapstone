@@ -1,5 +1,5 @@
 require(RUnit)
-source("TSafer/main/model.R")
+source("main/model.R")
 
 model.tests <- function(){
     
@@ -7,7 +7,7 @@ model.tests <- function(){
     names(Ngrams.count2) <- c("foo bar", "pluch bar", "foo pluch", "<BOS> <EOS>")
     
     model.learn(Ngrams.count2, 'Uni.gram')
-    Uni.gram.test <- readRDS("./TSafer/test/sources/model.test.N1.gram.rds")
+    Uni.gram.test <- readRDS("test/sources/model.test.N1.gram.rds")
     print(sprintf("UniGram.model status: %s", checkEquals(Uni.gram, Uni.gram.test)))
     
     Ngrams.count3 <- c(1,2,1,1,1,1,1)
@@ -15,11 +15,11 @@ model.tests <- function(){
                               "submit drunk elephant", "submit drunk vector", "deploy in prod")
     
     model.learn(Ngrams.count3, 'N2.gram', level='higher')
-    N2.gram.test <- readRDS("./TSafer/test/sources/model.test.N2.gram.rds")
+    N2.gram.test <- readRDS("test/sources/model.test.N2.gram.rds")
     print(sprintf("N2.gram.model status: %s", checkEquals(N2.gram, N2.gram.test)))
     
     model.learn(Ngrams.count3, 'N3.gram', level='highest')
-    N3.gram.test <- readRDS("./TSafer/test/sources/model.test.N3.gram.rds")
+    N3.gram.test <- readRDS("test/sources/model.test.N3.gram.rds")
     print(sprintf("N3.gram.model status: %s", checkEquals(N3.gram, N3.gram.test)))
     
     get.row.test.model <- data.table(first=c("cement foo", "free foo", "submit drunk"),
