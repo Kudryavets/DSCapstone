@@ -3,6 +3,7 @@ require(shiny)
 shinyUI(fluidPage(
     
     h1(strong("TSafer. Use to predict the next word!")),
+    h4("Please wait a few seconds while models are loading."),
     
     fluidRow(
         column(6,
