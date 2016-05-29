@@ -43,7 +43,9 @@ shinyServer(function(input, output) {
             withProgress({
                 setProgress(message = "Processing...")
                 if (length(input.text.parsed()) > 0) {
-                    logs <- capture.output(pr <- meta.model.predict(input.text.parsed(), names, 10, loging=TRUE))
+                    time <- system.time(
+                        logs <- capture.output(
+                            pr <- meta.model.predict(input.text.parsed(), names, 10, loging=TRUE)))
                     preds <- pr[!is.na(pr)]
                     list(logs = logs, predicted.words = preds)
                 }
@@ -100,8 +102,14 @@ shinyServer(function(input, output) {
         if (nchar(input$text) == 0)
             paste(status, collapse = "\n")
         else {
-            a <- unique(unlist(strsplit(predict.words()$logs, "[1]", fixed = TRUE)))
-            paste(a[2:length(a)], collapse = '\n')
+            logs <- unique(unlist(strsplit(predict.words()$logs, "[1]", fixed = TRUE)))
+            time <- c()
+            for (i in 1:3) {
+                time <- c(time, sprintf("time spent %s: %.3f", 
+                                        sub(".self", "", names(predict.words()$time[i]), fixed = T), 
+                                        unname(predict.words()$time[i])))
+            }
+            paste(c(logs[2:length(logs)], time), collapse = '\n')
         }
     })
 })
