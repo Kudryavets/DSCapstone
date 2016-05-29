@@ -37,13 +37,13 @@ shinyServer(function(input, output) {
         input.text.parsed <- sub(" <EOS>", "", process.text(input$text, profanity.vec))
     })
     
-    predicted.words <- eventReactive(input$goButton, {
+    predict.words <- eventReactive(input$goButton, {
         # делаем предсказания
         isolate({
             withProgress({
                 setProgress(message = "Processing...")
                 if (length(input.text.parsed()) > 0) {
-                    pr <- meta.model.predict(input.text.parsed(), names, 10)
+                    logs <- capture.output(pr <- meta.model.predict(input.text.parsed(), names, 10, loging=TRUE))
                     predicted.words <- pr[!is.na(pr)]
                 }
             })
@@ -52,7 +52,8 @@ shinyServer(function(input, output) {
     
     output$predictedWords <- renderText({
         # выводим предсказания
-        pr <- predicted.words()[1:5]
+        preds <- predict.words()
+        pr <- preds$predicted.words[1:5]
         pr <- pr[!is.na(pr)]
         paste(names(pr), collapse = '\n')
     })
@@ -72,8 +73,8 @@ shinyServer(function(input, output) {
     
     output$wordCloud <- renderPlot({
         # отрисовываем предсказания
-        if (!is.null(predicted.words())) {
-            w <- predicted.words()
+        if (!is.null(predict.words())) {
+            w <- predict.words()$predicted.words
             wordcloud_rep(words = names(w), freq = w, scale = c(4,0.5),
                           colors=brewer.pal(8, "Dark2"))
         }
@@ -81,8 +82,8 @@ shinyServer(function(input, output) {
     
     output$wordTable <- renderTable({
         # расписываем предсказания с вероятностями 
-        if (!is.null(predicted.words())) 
-            data.frame(predicted.words=predicted.words())
+        if (!is.null(predict.words())) 
+            data.frame(predicted.words=predict.words()$predicted.words)
     })
     
     output$modelSummary <- renderText({
@@ -94,7 +95,11 @@ shinyServer(function(input, output) {
         # выводим логи предсказателя, тестов
         if (nchar(input$text) == 0)
             paste(status, collapse = "\n")
-        else
-            sprintf("processing query: %s", input.text.parsed())
+        else {
+            if (is.null(predict.words()))
+                sprintf("processing query: %s", input.text.parsed())
+            else
+                predict.words()$logs
+        }
     })
 })

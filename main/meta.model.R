@@ -38,7 +38,7 @@ meta.model.load <- function(path) {
     return(names)
 }
 
-meta.model.predict <- function(sentence, names, preds.num) {
+meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
     highest.ngram = max(as.numeric(regmatches(names, regexpr("[[:digit:]]",names))))
     
     sorting <- function(short.seq,long.seq) {
@@ -62,15 +62,19 @@ meta.model.predict <- function(sentence, names, preds.num) {
         
         if (nrow(model.rows)==0) {
             if (ngram.rang == 1) {
+                if (loging) print("Using model for unknown words")
                 result <- "Here will be the model for unknown words"
             } else {
+                if (loging) print(sprintf("%dgram did't find, searching for %dgram", ngram.rang, ngram.rang-1))
                 result <- compute.Ngram.prob(ngram.rang-1, Ngram)
             }
         } else {
             if (ngram.rang==1) {
+                if (loging) print("Using unigram probabilities")
                 result <- model.rows[,last.term]
                 names(result) <- model.rows[,first]
             } else {
+                if (loging) print(sprintf("Using %dgram model", ngram.rang))
                 lower.ngram.prob <- 
                     if (ngram.rang == 2) {
                         do.call(c, 
@@ -98,8 +102,9 @@ meta.model.predict <- function(sentence, names, preds.num) {
     }
     
     preds <- compute.Ngram.prob(highest.ngram,sentence)
+    if (loging) print("Sorting")
     prep.preds <- if (is.finite(preds.num)) sort(preds, decreasing=T)[1:preds.num] else sort(preds, decreasing=T)
-
+    if (loging) print("Done!")
     return(prep.preds)
 }
 
