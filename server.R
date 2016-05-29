@@ -47,7 +47,7 @@ shinyServer(function(input, output) {
                         logs <- capture.output(
                             pr <- meta.model.predict(input.text.parsed(), names, 10, loging=TRUE)))
                     preds <- pr[!is.na(pr)]
-                    list(logs = logs, predicted.words = preds)
+                    list(logs = logs, predicted.words = preds, time = time)
                 }
             })
         })
@@ -105,11 +105,13 @@ shinyServer(function(input, output) {
             logs <- unique(unlist(strsplit(predict.words()$logs, "[1]", fixed = TRUE)))
             time <- c()
             for (i in 1:3) {
-                time <- c(time, sprintf("time spent %s: %.3f", 
+                time <- c(time, sprintf("time spent (by) %s: %.3f", 
                                         sub(".self", "", names(predict.words()$time[i]), fixed = T), 
                                         unname(predict.words()$time[i])))
             }
-            paste(c(logs[2:length(logs)], time), collapse = '\n')
+            paste(c("Predictor logs:",
+                logs[2:length(logs)], 
+                time), collapse = '\n')
         }
     })
 })
