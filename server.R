@@ -34,7 +34,7 @@ shinyServer(function(input, output) {
     
     input.text.parsed <- reactive({
         # обрабатываем текст
-        input.text.parsed <- sub(" <EOS>", "", process.text(input$text, profanity.vec))
+        sub(" <EOS>", "", process.text(input$text, profanity.vec))
     })
     
     predict.words <- eventReactive(input$goButton, {
@@ -44,7 +44,8 @@ shinyServer(function(input, output) {
                 setProgress(message = "Processing...")
                 if (length(input.text.parsed()) > 0) {
                     logs <- capture.output(pr <- meta.model.predict(input.text.parsed(), names, 10, loging=TRUE))
-                    predicted.words <- pr[!is.na(pr)]
+                    preds <- pr[!is.na(pr)]
+                    list(logs = logs, predicted.words = preds)
                 }
             })
         })
@@ -60,20 +61,21 @@ shinyServer(function(input, output) {
     
     output$instructions <- renderText({
         # показываем инструкции для пользователя
-        if (nchar(input$text) == 0) {
+        if (nchar(input$text) == 0)
             instructions
-        } else if (nchar(input$text) > 0) {
+        else if (length(input.text.parsed()) == 0)
             print("Please, enter more than two words! Then press Predict.")
-        } else {
-            print("Wait for a few seconds and check the Predicted Words Box!")
-        }
+        else
+            sprintf("Processing query: %s\nPress predict!", input.text.parsed())
     })
     
     wordcloud_rep <- repeatable(wordcloud)
     
     output$wordCloud <- renderPlot({
         # отрисовываем предсказания
-        if (!is.null(predict.words())) {
+        if (nchar(input$text) == 0)
+            NULL
+        else {
             w <- predict.words()$predicted.words
             wordcloud_rep(words = names(w), freq = w, scale = c(4,0.5),
                           colors=brewer.pal(8, "Dark2"))
@@ -82,7 +84,9 @@ shinyServer(function(input, output) {
     
     output$wordTable <- renderTable({
         # расписываем предсказания с вероятностями 
-        if (!is.null(predict.words())) 
+        if (nchar(input$text) == 0)
+            NULL
+        else
             data.frame(predicted.words=predict.words()$predicted.words)
     })
     
@@ -96,10 +100,8 @@ shinyServer(function(input, output) {
         if (nchar(input$text) == 0)
             paste(status, collapse = "\n")
         else {
-            if (is.null(predict.words()))
-                sprintf("processing query: %s", input.text.parsed())
-            else
-                predict.words()$logs
+            a <- unique(unlist(strsplit(predict.words()$logs, "[1]", fixed = TRUE)))
+            paste(a[2:length(a)], collapse = '\n')
         }
     })
 })

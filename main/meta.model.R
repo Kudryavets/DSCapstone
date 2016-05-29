@@ -52,6 +52,7 @@ meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
     }
     
     compute.Ngram.prob <- function(ngram.rang, text, highest.ngram=T) {
+        if (loging) print(sprintf("Using %dgram model", ngram.rang))
         split.words = unlist(strsplit(text,' '))
         len <- length(split.words)
         offset = if (ngram.rang == 1) 0 else ngram.rang - 2
