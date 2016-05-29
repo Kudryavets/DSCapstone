@@ -1,25 +1,11 @@
 require(RWeka)
-require(doParallel)
+
+source("main/multiprocessing.R")
 
 Ngrams.build <- function(text, N) NGramTokenizer(text, Weka_control(min = N, max = N))
 
 Ngrams.build.par <- function(text, N, cores=8) {
-    
-    parts = ceiling(length(text)/200000)
-    scope = if (parts>cores) parts else cores
- 
-    cl <- makeCluster(cores)
-    registerDoParallel(cl)
-
-    tokens <- foreach (i = 1:scope, .combine=c, .export= c('NGramTokenizer','Weka_control')) %dopar% {
-        start <- floor((i-1)*length(text)/scope) + 1
-        end <- floor(i*length(text)/scope)
-        NGramTokenizer(text[start:end], Weka_control(min = N, max = N))
-    }
-
-    stopCluster(cl)
-
-    return(tokens)
+    apply.func.par(text, 200000, NGramTokenizer, Weka_control(min = N, max = N), c('NGramTokenizer','Weka_control'), cores)
 }
 
 Ngrams.count.valid <- function(Ngrams, sparcity) {

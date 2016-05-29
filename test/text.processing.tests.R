@@ -38,7 +38,27 @@ text.processing.tests <- function() {
     
     profanity.vec <- c("ssdfs", "shit")
     
-    text.processing.result <- process.text(text.corpus,profanity.vec,verbose=F)
+    text.processing.result <- process.text(text.corpus,profanity.vec)
+    text.processing.result.par <- process.text.par(text.corpus,profanity.vec)
+    print(sprintf("text.processing status: %s", checkEquals(sort(text.processing.result), sort(text.processing.verif))))
+    print(sprintf("text.processing.par status: %s", checkEquals(sort(text.processing.result.par), sort(text.processing.verif))))
     
-    print(sprintf("text.processing status: %s", checkEquals(text.processing.result, text.processing.verif)))
+    text.corpus2 <- c("today i am thinking of a million things that would take years to write things about love about longing about dreams things about you and me",
+                      "we took the car he rented on the ferry with us over to a we got out of the car and walked over to the deck to look at the city skyline",
+                      "i had the weirdest dreams last night" )
+    vcb.verif <- c(" am","at","city","deck","ferry","got","had","he","last","longing",
+                   "look","love","me","million","night","on","out","rented","skyline","take",
+                   "that","thinking","today","took","us","walked","weirdest","with","would","write",
+                   "years","you ")
+    rr.vcb.res <- compute.rare.vocabulary(text.corpus2, 2)
+    print(sprintf("compute.rare.vocabulary: %s", checkEquals(rr.vcb.res, vcb.verif)))
+    
+    text.corpus2.verif <- c("today i <unk> thinking of a <unk> things <unk> would <unk> years to <unk> things about <unk> about <unk> about dreams things about <unk> and me",
+                            "we <unk> the car <unk> rented <unk> the <unk> with <unk> over to a we <unk> out of the car and <unk> over to the <unk> to <unk> at the <unk> skyline",
+                            "i <unk> the <unk> dreams <unk> night")
+    process.rare.res <- process.rare(text.corpus2, rr.vcb.res)
+    process.rare.par.res <- process.rare.par(text.corpus2, rr.vcb.res)
+    print(sprintf("process.rare: %s", checkEquals(process.rare.res, text.corpus2.verif)))
+    print(sprintf("process.rare.par: %s", checkEquals(process.rare.par.res, text.corpus2.verif)))
 }
+

@@ -1,4 +1,4 @@
-require(doParallel)
+source("main/multiprocessing.R")
 
 process.text <- function(text, profanity.vec, verbose=F) {
     
@@ -115,22 +115,25 @@ process.text <- function(text, profanity.vec, verbose=F) {
 }
 
 process.text.par <- function(text, profanity.vec, cores=8) {
-    
-    parts = ceiling(length(text)/50000)
-    scope = if (parts>cores) parts else cores
-    
-    cl <- makeCluster(cores)
-    registerDoParallel(cl)
-    
-    text.processed <- foreach (i = 1:scope, .combine=c, .export='process.text') %dopar% {
-        start <- floor((i-1)*length(text)/scope) + 1
-        end <- floor(i*length(text)/scope)
-        process.text(text[start:end], profanity.vec)
-    }
-    
-    stopCluster(cl)
-    
-    return(text.processed)
+    pt <- apply.func.par(text, 50000, process.text, profanity.vec, 'process.text', cores)
+    return(unique(pt))
 }
 
+compute.rare.vocabulary <- function(text, rare_tres, path=NULL) {
+    words_t <- table(unlist(strsplit(text, " ")))
+    vocabulary_rare <- names(words_t[words_t < rare_tres])
+    vocabulary_rare[1] = paste('',vocabulary_rare[1])
+    vocabulary_rare[length(vocabulary_rare)] = paste(vocabulary_rare[length(vocabulary_rare)],'')
+    if(!is.null(path)) saveRDS(vocabulary_rare, path) 
+    else return(vocabulary_rare)
+}
 
+process.rare <- function(text, rr.vcb) {
+    vocabulary.search <- gregexpr(paste(rr.vcb, collapse = ' | '), text)
+    regmatches(text, vocabulary.search) <- ' <unk> '
+    return(text)
+}
+
+process.rare.par <- function(text, rr.vcb, cores=8) {
+    apply.func.par(text, 50000, process.rare, rr.vcb, 'process.rare', cores)
+}

@@ -29,7 +29,6 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
         setkey(model, first)
         
         assign(model.name, model, envir = .GlobalEnv)
-        
         return()
     }
     

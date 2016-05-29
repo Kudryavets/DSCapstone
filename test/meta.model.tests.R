@@ -96,6 +96,7 @@ meta.model.tests <- function(){
         , test.8.meta.model.result, tolerance = .Machine$double.eps^0.4)))
     
     # Test.9 No ocurrances of any Ngram at all finded
+    # simply replace "any phrase you can imagine" to "any phrase you can <unk>" and restart predicting
     
     cat ("\n\nmeta.model.evaluate.size should print:\n\nSize in mb:  15 Kb\nSize in rows:  72\n\n")
     meta.model.evaluate.size(names.learn, 'KB')

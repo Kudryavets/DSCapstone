@@ -2,7 +2,8 @@ source("main/ngrams.R")
 source("main/model.R")
 source("main/text.processing.R")
 
-meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=0) {
+meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=list(
+                            N4gram.model=0, N3gram.model=0, N2gram.model=0, N1gram.model=0)) {
     result = list()
     names <- c()
     for (i in 2:(highest.ngram+1)) {
@@ -15,12 +16,13 @@ meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=0)
             name = sprintf('N%dgram.model',i-1)
         }
         cat("\r", sprintf("building %s", name))
-        NGrams <- Ngrams.build.par(corpus,i,cores)
-        NGrams.count <- Ngrams.count.valid(NGrams,valid)
+        
+        NGrams <- Ngrams.build.par(corpus, i, cores)
+        NGrams.count <- Ngrams.count.valid(NGrams, valid[[name]])
+        
         model.learn(NGrams.count, name, level)
-        if (!is.null(path)) {
-            saveRDS(get(name), sprintf("%s%s.rds", path, name))
-        }
+        
+        if (!is.null(path)) saveRDS(get(name), sprintf("%s%s.rds", path, name))
         names <- c(names,name)
     }
     return(names)
@@ -63,8 +65,10 @@ meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
         
         if (nrow(model.rows)==0) {
             if (ngram.rang == 1) {
-                if (loging) print("Using model for unknown words")
-                result <- "Here will be the model for unknown words"
+                if (loging) print("Using models for unknown words")
+                s <- unlist(strsplit(sentence, " "))
+                s <- paste(c(s[1:(length(s) - 1)], "<unk>"), collapse = " ")
+                result <- compute.Ngram.prob(highest.ngram, s)
             } else {
                 if (loging) print(sprintf("%dgram did't find, searching for %dgram", ngram.rang, ngram.rang-1))
                 result <- compute.Ngram.prob(ngram.rang-1, Ngram)
