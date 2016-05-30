@@ -1,6 +1,7 @@
 require(RUnit)
 source("main/ngrams.R")
 
+
 ngrams.tests <- function() {
     
     test.corpus <- c("<BOS> dayton oh august <othdigit> <link> republican john mccain has picked first term alaska <EOS>",

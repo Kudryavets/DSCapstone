@@ -1,6 +1,7 @@
 require(RUnit)
 source("main/model.R")
 
+
 model.tests <- function(){
     
     Ngrams.count2 <- c(1,2,2,1)

@@ -22,86 +22,47 @@ process.text <- function(text, profanity.vec, verbose=F) {
     new.phrases.search <- gregexpr("\\(([[:graph:]]+\\s)+[[:graph:]]+\\)", text)
     new.phrases <- unlist(regmatches(text, new.phrases.search))
     text <- gsub("\\(([[:graph:]]+\\s)+[[:graph:]]+\\)","", text)
-    text <- c(text, new.phrases)
+    text <- gsub('(I)([[:punct:][:blank:]])', '<ich>\\2', text)
+    text <- tolower(c(text, new.phrases))
     
     ############################################# 8. Ищем общеупотребительные названия и имена заключаем их в <>
     
+    gsub.multiple.patterns <- function(text, patterns){
+        for (pt in patterns) text <- gsub(pt[1],pt[2], text)
+        return(text)
+    }
+    
     if (verbose) cat('\n# Ищем special_words и заменяем на <special words>\n', text)
-    #     emails                     <email>
-    text <- gsub("[[:graph:]]+@[a-z]+\\.[a-z]+",'<email>', text)
-    
-    #     social network user        <user> 
-    text <- gsub("@[A-Za-z_]+",' <user>', text)
-    
-    #     порядковое числительное    <ordinal>
-    text <- gsub('[0-9]+(nd|st|rd|th)','<ordinal>', text)
-    
-    #     hash-tags                  <hashtag>
-    text <- gsub('#[A-Za-z_]+','<hashtag>', text)
-    
-    #     web-site references        <link>
-    text <- gsub('(http|www)[[:graph:]]+[A-Za-z]+', '<link>', text)
+    money.pattern <- "(usd|eur|gbp|[£€$]) *[[:digit:]]+|(usd|eur|gbp|[£€$]) *[[:digit:]]*\\.[[:digit:]]+|[[:digit:]]+ *(usd|eur|gbp|cents|[£€$])|[[:digit:]]*\\.[[:digit:]]+ *(usd|eur|gbp|cents|[£€$])"  
+    patterns.list.part1 <- list(c("[[:graph:]]+@[a-z]+\\.[a-z]+",'<email>'),
+                            c("@[a-z_]+",' <user>'), c('[0-9]+(nd|st|rd|th)','<ordinal>'),
+                            c('#[a-z_]+','<hashtag>'), c('(http|www)[[:graph:]]+[a-z]+', '<link>'),
+                            c(money.pattern,'<money>'), c('[[:digit:]]+\\.?[[:digit:]]+ ?%', '<percent>'),
+                            c('[[:digit:]]+\\.?[[:digit:]]+', '<othdigit>'), c("[?!;.]+","."),
+                            c('mr\\.', '<mr>'), c('mrs\\.', '<mrs>'), c('ms\\.', '<ms>'), c('dr\\.', '<dr>'))
+    text <- gsub.multiple.patterns(text, patterns.list.part1)
     
     #############################################     телефоны                   <phonenumber>
-    
     #############################################     время, даты                <time>, <date>
-    
     #############################################     дни недели, месяцы
-    
     #############################################     почтовые коды              <postalcode>
-    
     #############################################     имена                      <name>
     
-    #     деньги                     <money>
-    money.pattern <- "(USD|EUR|GBP|[£€$]) *[[:digit:]]+|(USD|EUR|GBP|[£€$]) *[[:digit:]]*\\.[[:digit:]]+|[[:digit:]]+ *(USD|EUR|GBP|cents|[£€$])|[[:digit:]]*\\.[[:digit:]]+ *(USD|EUR|GBP|cents|[£€$])"  
-    text <- gsub(money.pattern,'<money>', text)
+    if (verbose) cat('\n# Разбиваем документы по фразам \n', text)
+    text <- unlist(strsplit(text, "\\.\\s+"))
     
-    #     percents                   <percent>
-    text <- gsub('[[:digit:]]+\\.?[[:digit:]]+ ?%', '<percent>', text)
-    
-    #     оставшиеся цифры           <othdigit>
-    text <- gsub('[[:digit:]]+\\.?[[:digit:]]+', '<othdigit>', text)
-    
-    # Replace [?!;.]+ with [.]
-    text <- gsub("[?!;.]+",".",text)
-    
-    # Replace [Mr.,Ms,Mrs,Dr]+ with <mr>,<mrs>,<ms>,<dr>
-    text <- gsub('Mr\\.|mr\\.', '<mr>', text)
-    text <- gsub('Mrs\\.|mrs\\.', '<mrs>', text)
-    text <- gsub('Ms\\.|ms\\.', '<ms>', text)
-    text <- gsub('Dr\\.|dr\\.', '<dr>', text)
-    
-    #     I                          <ich>
-    text <- gsub('(I)([[:punct:][:blank:]])', '<ich>\\2', text)
-    
-    if (verbose) cat('\n# Разбиваем документы по фразам, tolower\n', text)
-    text <- unlist(strsplit(tolower(text), "\\.\\s+"))
-    
-    text <- gsub("'s", ' is', text)
-    text <- gsub("'re", ' are', text)
-    text <- gsub("'d", ' would', text)
-    text <- gsub("'ve", ' have', text)
-    text <- gsub("n't", ' not', text)
-    text <- gsub("'m", ' am', text)
-    
-    if (verbose) cat("\n# Удаляем всю оставшуюся пунктуацию, кроме '\n", text)
-    text <- gsub("[»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," ",text)
-    text <- gsub("\\.","",text)
-    text <- gsub("[{}]+|\"|\\[+|\\]+\""," ",text)
-    
-    if (verbose) cat('\n# Удаляем неанглийские слова\n', text)
-    text <- gsub('[—-）]+', '<foreign>', text)
+    patterns.list.part2 <- list(c("'s", ' is'),c("'re", ' are'), c("'d", ' would'),
+                                c("'ve", ' have'), c("n't", ' not'), c("'m", ' am'),
+                                c("[»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," "),
+                                c("\\.",""), c("[{}]+|\"|\\[+|\\]+\""," "), c('[—-）]+', '<foreign>'))
+    text <- gsub.multiple.patterns(text, patterns.list.part2)
     
     if (verbose) cat('\n# Удаляем все оставшиеся странные знаки\n', text)
     text <- iconv(text, "latin1", "ASCII", sub="")
     
-    if (verbose) cat('\n# Удаляем пробелы в конце и в начале предложения \n', text)
-    text <- gsub("[ \t\r\n\f]+"," ", text)
-    text <- gsub("^[ \t\r\n\f]+|[ \t\r\n\f]+$","", text)
-    
-    if (verbose) cat('\n# проставляем начало и конец предложения\n', text)
-    text <- gsub("^","<BOS> ", text)
-    text <- gsub("$"," <EOS>", text)
+    patterns.list.part3 <- list(c("[ \t\r\n\f]+"," "), c("^[ \t\r\n\f]+|[ \t\r\n\f]+$",""),
+                                c("^","<BOS> "), c("$"," <EOS>"))
+    text <- gsub.multiple.patterns(text, patterns.list.part3)
     
     if (verbose) cat('\n# Чистим от плохих слов, заменяем на <profanity>\n', text)
     profanity.vec[1] = paste(' +',profanity.vec[1], collapse = '')

@@ -1,6 +1,7 @@
 require(RUnit)
 source("main/text.processing.R")
 
+
 text.processing.tests <- function() {
     
     text.corpus <- c("short sentence", 

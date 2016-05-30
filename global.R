@@ -30,8 +30,7 @@ get.restored <- function(preds.ch.vec) {
                     c('<ich>', 'I'), c('<foreign>', '<Some foreign 飛散す words?>'), 
                     c("<EOS>","<End of sentence>!!!"), c("<profanity>","<Some f.cking profanity word?>"))
     
-    for (pt in paterns){
-        preds.ch.vec <- gsub(pt[1],pt[2], preds.ch.vec)
-    } 
+    for (pt in paterns) preds.ch.vec <- gsub(pt[1],pt[2], preds.ch.vec)
+    
     return(preds.ch.vec)
 }
