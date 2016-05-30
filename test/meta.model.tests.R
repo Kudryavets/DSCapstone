@@ -98,23 +98,23 @@ meta.model.tests <- function(){
     # Test.9 No ocurrances of any Ngram at all finded
     # simply replace "any phrase you can imagine" to "any phrase you can <unk>" and restart predicting
     
-    cat ("\n\nmeta.model.evaluate.size should print:\n\nSize in mb:  15 Kb\nSize in rows:  72\n\n")
-    meta.model.evaluate.size(names.learn, 'KB')
+    cat ("\n\nmeta.model.evaluate.size should print:\nSize on disc in MB: 0.00\nSize in mb:  15 Kb\nSize in rows:  72\n\n")
+    meta.model.evaluate.size(names.load, "test/sources/", 'KB')
     
     cat ("\n\nmeta.model.evaluate.speed should print:\n\nuser  system elapsed\n4.140   0.000   4.038\n\n")
-    meta.model.evaluate.speed(names.learn, "two different")
+    meta.model.evaluate.speed(names.load, "two different")
     
     cat ("\n\nmeta.model.evaluate.accuracy shold print:\n\n\t1 accuracy.precise: 0.666667
         1 accuracy.prob:  0.619472\n\t1 accuracy.order:  2.33
         2 accuracy.precise: 0.500000\n\t2 accuracy.prob:  0.470430
         2 accuracy.order:  3.00\n\t3 accuracy.precise: 0.000000
         3 accuracy.prob:  0.081550\n\t3 accuracy.order:  4.00\n\n")
-    meta.model.evaluate.accuracy(names.learn,
+    meta.model.evaluate.accuracy(names.load,
                                  c("occurrences of 4gram test31", "occurrences of 4gram testevaluation"),
                                  highest.ngram=3, penalty=1, cores=1)
 
     cat ("\n\nmeta.model.evaluate.perplexity should print:\n\nperplexity per word 26.02\n\n")
-    meta.model.evaluate.perplexity(names.learn,
+    meta.model.evaluate.perplexity(names.load,
                                    c("occurrences of 4gram test31", "occurrences of 4gram testevaluation"),
                                    cores=1)
     

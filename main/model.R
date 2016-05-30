@@ -1,5 +1,14 @@
 require(data.table)
 
+
+#' model.learn
+#'
+#' @param Ngrams.count : ngrams count table as named numeric.vector
+#' @param model.name : name of the model (str)
+#' @param level : level of model for Kneser-ney smoothing, one of ('highest','higher')
+#'
+#' @return assign @model.name to Data Table 
+#'
 model.learn <- function(Ngrams.count, model.name, level='higher') {
     
     N = length(unlist(strsplit(names(Ngrams.count[1]), " ")))
@@ -87,6 +96,14 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
     assign(model.name, model, envir = .GlobalEnv)
 }
 
+
+#' model.get.row
+#'
+#' @param model : ngram model in Data table with index "first" 
+#' @param NGram : ngram to find (string)
+#'
+#' @return Data Table with @Ngram as first in each row
+#' 
 model.get.row <- function(model, NGram) {
     return(model[first==NGram])
 }

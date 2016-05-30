@@ -1,9 +1,7 @@
 Can you think of any other data sources that might help you in this project?  WSJ kaggle
 Can you think of a way to increase the coverage -- identifying words that may not be in the corpora or using a smaller number of words in the dictionary to cover the same number of phrases?
-How can you efficiently store an n-gram model (think Markov Chains)?
 How can you use the knowledge about word frequencies to make your model smaller and more efficient?
 How many parameters do you need (i.e. how big is n in your n-gram model)?
-Build a model to handle unseen n-grams - in some cases people will want to type a combination of words that does not appear in the corpora. Build a model to handle cases where a particular n-gram isn't observed.
 
 Questions to consider
 How does the model perform for different choices of the parameters and size of the model? 
@@ -20,16 +18,8 @@ What are the most commonly missed n-grams? Can you think of a reason why they wo
 What are some other things that other people have tried to improve their model? 
 Can you estimate how uncertain you are about the words you are predicting? 
 
-Questions to consider
-How should you document the use of your data product (separately from how you created it) so that others can rapidly deploy your algorithm?
-
 Tasks to accomplish
 Create a slide deck promoting your product. Write 5 slides using RStudio Presenter explaining your product and why it is awesome!
-
-
-
-
-
 
 
 
@@ -63,3 +53,6 @@ Create a slide deck promoting your product. Write 5 slides using RStudio Present
 # How can you briefly explain how your predictive model works?
 # How can you succinctly quantitatively summarize the performance of your prediction algorithm?
 # How can you show the user how the product works?
+# How can you efficiently store an n-gram model (think Markov Chains)?
+# Build a model to handle unseen n-grams - in some cases people will want to type a combination of words that does not appear in the corpora. Build a model to handle cases where a particular n-gram isn't observed.
+# How should you document the use of your data product (separately from how you created it) so that others can rapidly deploy your algorithm?

@@ -1,6 +1,5 @@
 ###### CONCLUSIONS
 
-документация для функций
 restoring function
 
 делаем презу

@@ -1,5 +1,14 @@
 source("main/multiprocessing.R")
 
+
+#' Title
+#'
+#' @param text : text corpus in ch.vector
+#' @param profanity.vec : ch.vector of profanity words from google list 
+#' @param verbose : logging parametr, if true print function processing progress 
+#'
+#' @return processed text corpus
+#' 
 process.text <- function(text, profanity.vec, verbose=F) {
     
     if (verbose) cat('\n# Удаляем <>\n', text)
@@ -114,11 +123,28 @@ process.text <- function(text, profanity.vec, verbose=F) {
     return(text)
 }
 
+
+#' process.text.par
+#'
+#' @param cores : core to use for multiprocessing
+#' 
+#' the same as process.text but work in parallel and
+#' @export apply.func.par from multiprocessing.R
+#'
 process.text.par <- function(text, profanity.vec, cores=8) {
     pt <- apply.func.par(text, 50000, process.text, profanity.vec, 'process.text', cores)
     return(unique(pt))
 }
 
+
+#' compute.rare.vocabulary
+#'
+#' @param text : text corpus in ch.vector
+#' @param rare_tres : treshold indicates which words shold be considered as rare (in counts)
+#' @param path : path to store result
+#'
+#' @return rare words in ch.vector
+#'
 compute.rare.vocabulary <- function(text, rare_tres, path=NULL) {
     words_t <- table(unlist(strsplit(text, " ")))
     vocabulary_rare <- names(words_t[words_t < rare_tres])
@@ -128,12 +154,28 @@ compute.rare.vocabulary <- function(text, rare_tres, path=NULL) {
     else return(vocabulary_rare)
 }
 
+
+#' process.rare
+#'
+#' @param text : text corpus as ch.vector
+#' @param rr.vcb : dictionary of rare words wich should be replaced by <unk>
+#'
+#' @return text corpus as ch.vector with rare words replaced
+#'
 process.rare <- function(text, rr.vcb) {
     vocabulary.search <- gregexpr(paste(rr.vcb, collapse = ' | '), text)
     regmatches(text, vocabulary.search) <- ' <unk> '
     return(text)
 }
 
+
+#' process.rare.par
+#'
+#' analog of process.rare but work in parallel and
+#' @param cores : core to use for multiprocessing
+#'
+#' @export apply.func.par from multiprocessing.R
+#'
 process.rare.par <- function(text, rr.vcb, cores=8) {
     apply.func.par(text, 50000, process.rare, rr.vcb, 'process.rare', cores)
 }

@@ -1,7 +1,18 @@
 source("main/ngrams.R")
 source("main/model.R")
-source("main/text.processing.R")
 
+
+#' meta.model.learn
+#'
+#' @param corpus : processed training text corpus as ch.vector
+#' @param highest.ngram : highest level of models (int)
+#' @param path : path to store models (string)
+#' @param cores : number of cores to use for multiprocessing
+#' @param valid : list of params for every model, every param is a treshold for NGrams.count
+#'
+#' @return names of builded models, assign it to DataTables
+#' @export Ngrams.build.par, Ngrams.count.valid from ngrams.R, model.learn from model.R
+#'
 meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=list(
                             N4gram.model=0, N3gram.model=0, N2gram.model=0, N1gram.model=0)) {
     result = list()
@@ -28,6 +39,13 @@ meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=li
     return(names)
 }
 
+
+#' meta.model.load
+#'
+#' @param path : path to load models from (string)
+#'
+#' @return find models and load it
+#'
 meta.model.load <- function(path) {
     files <- list.files(path, pattern = "N.gram", full.names = T)
     result <- list()
@@ -40,6 +58,17 @@ meta.model.load <- function(path) {
     return(names)
 }
 
+
+#' meta.model.predict
+#'
+#' @param sentence : query for predicting string
+#' @param names : names of models to use for predicting ch.vector
+#' @param preds.num : number of predictings to show (int)
+#' @param loging : loging parametr, if true prints statement of process
+#'
+#' @return named numeric vector with preds and its probabilities
+#' @export model.get.row from model.R
+#'
 meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
     highest.ngram = max(as.numeric(regmatches(names, regexpr("[[:digit:]]",names))))
     
@@ -108,24 +137,46 @@ meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
     
     preds <- compute.Ngram.prob(highest.ngram,sentence)
     if (loging) print("Sorting")
-    prep.preds <- if (is.finite(preds.num)) sort(preds, decreasing=T)[1:preds.num] else sort(preds, decreasing=T)
+    prep.preds <- if (is.finite(preds.num)) sort(preds, decreasing=T)[1:preds.num] 
+                    else sort(preds, decreasing=T)
     if (loging) print("Done!")
     return(prep.preds)
 }
 
-meta.model.evaluate.size <- function(model_names, unit="MB") {
-    
+
+#' meta.model.evaluate.size
+#'
+#' @param model_names : models to evaluete (ch.vector)
+#' @param path : path to where models stored (string)
+#' @param unit : unit of size "MB" and etc (string)
+#'
+#' @return prints all-in-all size in rows, in memory usage and disk usage for these models
+#'
+meta.model.evaluate.size <- function(model_names, path, unit="MB") {
     print("# model size")
-    size.in.bytes = 0
+    files <- list.files(path, pattern = "N.gram", full.names = T)
+    size.in.memory = 0
     size.in.nrows = 0
     for (name in model_names) {
-        size.in.bytes = size.in.bytes + object.size(get(name))
+        size.in.memory = size.in.memory + object.size(get(name))
         size.in.nrows = size.in.nrows + nrow(get(name))
     }
-    cat('\nSize in mb: ', format(size.in.bytes, units=unit))
+    size.on.disc = sum(file.info(files)$size)
+    
+    cat(sprintf("\nSize on disc in MB: %.2f", size.on.disc/1048576))
+    cat(sprintf('\nSize in memmory in %s: ', unit), format(size.in.memory, units=unit))
     cat('\nSize in rows: ', size.in.nrows)
 }
 
+
+#' meta.model.evaluate.speed
+#'
+#' @param model_names : models to evaluate (ch.vector)
+#' @param request : request to evaluete speed of @N.requests reqests string
+#' @param N.requests : number of reqests to do int
+#'
+#' @return system.time needed to do @N.requests 
+#'
 meta.model.evaluate.speed <- function(model_names, request, N.requests=1000) {
     print("# requests time")
     print(system.time( for (i in 1:N.requests) {
@@ -133,6 +184,23 @@ meta.model.evaluate.speed <- function(model_names, request, N.requests=1000) {
     }))
 }
 
+
+#' meta.model.evaluate.accuracy
+#'
+#' @param model_names : models to evaluate (ch.vector)
+#' @param test.corpus : corpus for testing (processed ch.vector)
+#' @param highest.ngram : highest.ngram in models (int)
+#' @param N.preds : amount of predictions to consider (int)
+#' @param penalty : penalty on accuracy to use when preds doesn't contain right answer (int)
+#' @param cores : cores to use for multiprocessing
+#'
+#' @return prints 
+#'              accuracy.precise - averaged number of cases where rigth answer is first prediction,
+#'              accuracy.prob - average probability of right answer
+#'              accuracy.order - average order number of rigth answer
+#'
+#' @export Ngrams.build.par from ngrams.R
+#'
 meta.model.evaluate.accuracy <- function(model_names, test.corpus, highest.ngram=3, 
                                          N.preds=5, penalty=1, cores=8) {
     for (i in 1:highest.ngram+1) {
@@ -164,6 +232,16 @@ meta.model.evaluate.accuracy <- function(model_names, test.corpus, highest.ngram
     } 
 }
 
+
+#' meta.model.evaluate.perplexity
+#'
+#' @param model_names : models to evaluate (ch.vector)
+#' @param test.corpus : corpus for testing (processed ch.vector)
+#' @param penalty : penalty on accuracy to use when preds doesn't contain right answer (int)
+#' @param cores : cores to use for multiprocessing
+#'
+#' @return prints perplexity per word in test corpus
+#'
 meta.model.evaluate.perplexity <- function(model_names, test.corpus, penalty = 10^-5, cores=8) {
     perplexity.acc <- 0
     scope <- length(test.corpus)
