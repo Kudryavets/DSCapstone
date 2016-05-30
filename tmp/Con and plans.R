@@ -1,7 +1,5 @@
 ###### CONCLUSIONS
 
-restoring function
-
 делаем презу
 
 Сокращаем объем текста, пытаясь захватить большее количество уникальных слов (Remove singletons of higher-order n-grams, Quan*ze probabili*es (4-8 bits instead of 8-byte float))

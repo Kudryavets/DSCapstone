@@ -47,7 +47,7 @@ shinyServer(function(input, output) {
         preds <- predict.words()
         pr <- preds$predicted.words[1:5]
         pr <- pr[!is.na(pr)]
-        paste(names(pr), collapse = '\n')
+        paste(get.restored(names(pr)), collapse = '\n')
     })
     
     output$instructions <- renderText({
