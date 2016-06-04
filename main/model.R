@@ -66,7 +66,9 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
     }
     
     n.1 <- model[Ngrams.count==1,.N]
+    if (n.1 == 0) n.1 <- 1
     n.2 <- model[Ngrams.count==2,.N*2]
+    if (n.2 == 0) n.2 <- 1
     D <- n.1/(n.1+2*n.2)
     
     if (level == 'higher') {

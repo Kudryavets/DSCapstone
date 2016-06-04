@@ -1,5 +1,6 @@
 require(doParallel)
 
+
 #' Title
 #'
 #' @param text : text corpus in any format which provide slicing 

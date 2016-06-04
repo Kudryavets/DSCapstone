@@ -21,9 +21,13 @@ for (src in c("blogs", "news", "twitter")){
 
 train_corpus <- c(blogs.train, news.train, twitter.train)
 
+rr.vcb <- compute.rare.vocabulary(train_corpus, 2)
+process.rare.par(train_corpus, rr.vcb, "main/sources/rr_vcb.rds")
+train_corpus_rr <- readRDS("main/sources/rr_vcb.rds")
+
 # learning
-config = list(N4gram.model=1, N3gram.model=2, N2gram.model=3, N1gram.model=4)
-names <- meta.model.learn(train_corpus, 4,"./TSafer/main/sources/", config)
+config = list(N4gram.model=1, N3gram.model=1, N2gram.model=2, N1gram.model=3)
+names <- meta.model.learn(train_corpus_rr, 4,"./TSafer/main/sources/", config)
 
 # preparing test corpus
 set.seed(5)
