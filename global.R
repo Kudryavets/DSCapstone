@@ -13,7 +13,7 @@ get.status <- function() c("text.processing status: OK", "Ngrams.building status
 get.summary <- function() c("model.size: 10 Mb", "model.speed: 1000 queries for 10 s", "accuracy by precise matching: 3",
                             "accuracy by probability rstimation: 0.4", "accuracy by order: 5", "perplexity per word: 1.37")
 
-get.instructions <- function() "This is TSafer, interactive app for the next word predictng. It uses interpolated Kneser-Ney smoothing for 4,3,2,1 grams and back-off model for unseen words.
+get.instructions <- function() "This is TSafer, interactive app for the next word predictng.
 Please, try this app, enter your phrase into the predicting area and check the unswer.
 At the bottom you can see the word cloud, which seems to be the best illustration for the predicted words probabilities.
 For some digits about the predictions click Probability Table.
