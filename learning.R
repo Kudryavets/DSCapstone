@@ -43,17 +43,17 @@ names <- meta.model.load("main/sources/")
 
 # preparing test corpus
 set.seed(5)
-bl.tst.smpl <- sample(blogs.test, 2)
+bl.tst.smpl <- sample(blogs.test, 10)
 set.seed(7)
-nw.tst.smpl <- sample(news.test, 2)
+nw.tst.smpl <- sample(news.test, 10)
 set.seed(10)
-tw.tst.smpl <- sample(twitter.test, 2)
+tw.tst.smpl <- sample(twitter.test, 10)
 
 test.corpus <- c(bl.tst.smpl, nw.tst.smpl, tw.tst.smpl)
 
 #evaluation
 meta.model.evaluate.size(names, "main/sources/", 'MB')
-meta.model.evaluate.speed(names, "hi cute little", 100)/100
+meta.model.evaluate.speed(names, "hi cute little", 10)/10
 meta.model.evaluate.accuracy(names, test.corpus, highest.ngram=4, penalty=1, cores=1)
 meta.model.evaluate.perplexity(names, test.corpus, cores=1)
 
