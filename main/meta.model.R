@@ -13,8 +13,8 @@ source("main/model.R")
 #' @return names of builded models, assign it to DataTables
 #' @export Ngrams.build.par, Ngrams.count.valid from ngrams.R, model.learn from model.R
 #'
-meta.model.learn <- function(corpus, highest.ngram, path=NULL, cores=8, valid=list(
-                            N4gram.model=0, N3gram.model=0, N2gram.model=0, N1gram.model=0)) {
+meta.model.learn <- function(corpus, highest.ngram, path=NULL, valid=list(
+                            N4gram.model=0, N3gram.model=0, N2gram.model=0, N1gram.model=0), cores=8) {
     result = list()
     names <- c()
     for (i in 2:(highest.ngram+1)) {
@@ -82,7 +82,7 @@ meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
         return(long.seq)
     }
     
-    compute.Ngram.prob <- function(ngram.rang, text, highest.ngram=T) {
+    compute.Ngram.prob <- function(ngram.rang, text, highest.ngram.bool=T) {
         if (loging) print(sprintf("Using %dgram model", ngram.rang))
         split.words = unlist(strsplit(text,' '))
         len <- length(split.words)
@@ -103,34 +103,32 @@ meta.model.predict <- function(sentence, names, preds.num, loging=FALSE) {
                 result <- compute.Ngram.prob(ngram.rang-1, Ngram)
             }
         } else {
-            if (ngram.rang==1) {
-                if (loging) print("Using unigram probabilities")
-                result <- model.rows[,last.term]
-                names(result) <- model.rows[,first]
-            } else {
-                if (loging) print(sprintf("Using %dgram model", ngram.rang))
-                lower.ngram.prob <- 
-                    if (ngram.rang == 2) {
-                        do.call(c, 
-                            lapply(model.rows[,last], 
-                                   function (word) compute.Ngram.prob(ngram.rang-1,word,highest.ngram=F)))
-                    } else {
-                        compute.Ngram.prob(ngram.rang-1,text,highest.ngram=F)
-                    }
-                
-                diff <- length(lower.ngram.prob)-nrow(model.rows)
-                lower.ngram.prob <- sorting(model.rows[,last],lower.ngram.prob)
-                
-                if (highest.ngram) {
-                    term.1 <- c(model.rows[,highest.first.term],rep(0,diff))
-                    term.2 <- c(model.rows[,highest.second.term],rep(1,diff))
+            if (loging) print(sprintf("Using %dgram model", ngram.rang))
+            lower.ngram.prob <- 
+                if (ngram.rang == 2) {
+                    model.name.1 <- names[grepl(ngram.rang-1,names)]
+                    model.rows.1 <- model.get.row(get(model.name.1), model.rows[,last], ret.na=T)
+                    if (loging) print("Using unigram probabilities")
+                    result <- model.rows.1[,last.term]
+                    result[is.na(result)] <- 0
+                    names(result) <- model.rows.1[,first]
+                    result
                 } else {
-                    term.1 <- c(model.rows[,first.term],rep(0,diff))
-                    term.2 <- c(model.rows[,second.term],rep(1,diff))
+                    compute.Ngram.prob(ngram.rang-1,text,highest.ngram.bool=F)
                 }
-                
-                result <- term.1 + term.2*lower.ngram.prob
+            
+            diff <- length(lower.ngram.prob)-nrow(model.rows)
+            lower.ngram.prob <- sorting(model.rows[,last],lower.ngram.prob)
+            
+            if (highest.ngram.bool) {
+                term.1 <- c(model.rows[,highest.first.term],rep(0,diff))
+                term.2 <- c(model.rows[,highest.second.term],rep(1,diff))
+            } else {
+                term.1 <- c(model.rows[,first.term],rep(0,diff))
+                term.2 <- c(model.rows[,second.term],rep(1,diff))
             }
+            
+            result <- term.1 + term.2*lower.ngram.prob
         }
         return(result)
     }

@@ -65,9 +65,9 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
         unique.Ngram.count <- nrow(model)
     }
     
-    n.1 <- model[Ngrams.count==1,.N]
+    n.1 <- model[Ngrams.count==2,.N]
     if (n.1 == 0) n.1 <- 1
-    n.2 <- model[Ngrams.count==2,.N*2]
+    n.2 <- model[Ngrams.count==3,.N*2]
     if (n.2 == 0) n.2 <- 1
     D <- n.1/(n.1+2*n.2)
     
@@ -106,6 +106,11 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
 #'
 #' @return Data Table with @Ngram as first in each row
 #' 
-model.get.row <- function(model, NGram) {
-    return(model[first==NGram])
+model.get.row <- function(model, NGrams, ret.na=F) {
+    if (ret.na){
+        return(model[NGrams])
+    } else {
+        return(model[NGrams, nomatch = 0L])
+    }
+    
 }

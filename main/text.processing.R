@@ -38,7 +38,7 @@ process.text <- function(text, profanity.vec, verbose=F) {
                             c("@[a-z_]+",' <user>'), c('[0-9]+(nd|st|rd|th)','<ordinal>'),
                             c('#[a-z_]+','<hashtag>'), c('(http|www)[[:graph:]]+[a-z]+', '<link>'),
                             c(money.pattern,'<money>'), c('[[:digit:]]+\\.?[[:digit:]]+ ?%', '<percent>'),
-                            c('[[:digit:]]+\\.?[[:digit:]]+', '<othdigit>'), c("[?!;.]+","."),
+                            c('[[:digit:]]+\\.?[[:digit:]]+|[[:digit:]]+', '<othdigit>'), c("[?!;.]+","."),
                             c('mr\\.', '<mr>'), c('mrs\\.', '<mrs>'), c('ms\\.', '<ms>'), c('dr\\.', '<dr>'))
     text <- gsub.multiple.patterns(text, patterns.list.part1)
     
@@ -53,7 +53,7 @@ process.text <- function(text, profanity.vec, verbose=F) {
     
     patterns.list.part2 <- list(c("'s", ' is'),c("'re", ' are'), c("'d", ' would'),
                                 c("'ve", ' have'), c("n't", ' not'), c("'m", ' am'),
-                                c("[»,–—^‘’(:)%/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," "),
+                                c("[»,–—^‘’(:)%-/\\|&§¶@+*“”`´„~″˚$#=£®_★☆♥〜∇·･●°¡€…]+"," "),
                                 c("\\.",""), c("[{}]+|\"|\\[+|\\]+\""," "), c('[—-）]+', '<foreign>'))
     text <- gsub.multiple.patterns(text, patterns.list.part2)
     

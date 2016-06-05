@@ -1,3 +1,5 @@
+options( java.parameters = "-Xmx6g" )
+
 require(RWeka)
 
 source("main/multiprocessing.R")
@@ -19,7 +21,7 @@ Ngrams.build <- function(text, N) NGramTokenizer(text, Weka_control(min = N, max
 #' @export apply.func.par from multiprocessing.R
 #' 
 Ngrams.build.par <- function(text, N, cores=8) {
-    apply.func.par(text, 200000, NGramTokenizer, Weka_control(min = N, max = N), c('NGramTokenizer','Weka_control'), cores)
+    apply.func.par(text, 100000, NGramTokenizer, Weka_control(min = N, max = N), c('NGramTokenizer','Weka_control'), cores)
 }
 
 
