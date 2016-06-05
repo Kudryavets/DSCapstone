@@ -13,12 +13,12 @@ get.status <- function() c("text.processing status: OK", "Ngrams.building status
 get.summary <- function() c("model.size: 40.14 Mb disc space, 333.4 Mb in memory", "answer speed: 100 queries for 20.036 s",
                             "accuracy by probabilities estimation: 0.103", "accuracy by predictions order: 4.58", "accuracy by first prediction: 0.163", "perplexity per word: 1471.46")
 
-get.instructions <- function() "This is TSafer, interactive app for the next word predictng.
+get.instructions <- function() "This is a TSafer, the interactive app for the next word predictng.
 Please, try this app, enter your phrase into the predicting area and check the unswer.
 At the bottom you can see the word cloud, which seems to be the best illustration for the predicted words probabilities.
 For some digits about the predictions click Probability Table.
 For some digits about the model click Model Summary.
-You can see model logs to the right. 
+You can see model logs on the right. 
 Have fun!"
 
 get.restored <- function(preds.ch.vec) {
