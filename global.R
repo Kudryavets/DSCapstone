@@ -10,7 +10,7 @@ get.status <- function() c("text.processing status: OK", "Ngrams.building status
                            "meta.model.load status: OK", "meta.model.predict status: OK", "meta.model.evaluate status: OK",
                            "all systems status: OK")
 
-get.summary <- function() c("model.size: 40.14 Mb disc space, 333.4 Mb in memory", "answer speed: 100 queries for 20.036 s", "accuracy by precise matching: 3",
+get.summary <- function() c("model.size: 40.14 Mb disc space, 333.4 Mb in memory", "answer speed: 100 queries for 20.036 s",
                             "accuracy by probabilities estimation: 0.103", "accuracy by predictions order: 4.58", "accuracy by first prediction: 0.163", "perplexity per word: 1471.46")
 
 get.instructions <- function() "This is TSafer, interactive app for the next word predictng.
