@@ -1,4 +1,5 @@
-TSafer (TypeSafer) A Natural Language Processing system which predicts the next word you want to enter.
+# TSafer (TypeSafer) 
+## A Natural Language Processing system which predicts the next word you want to enter.
 
 For training were used 50% blogs, 40% news and 60% twitter. That allowed to get 75% of unique words from all corpuses.
 
