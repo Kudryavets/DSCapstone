@@ -1,5 +1,14 @@
 require(data.table)
 
+
+#' model.learn
+#'
+#' @param Ngrams.count : ngrams count table as named numeric.vector
+#' @param model.name : name of the model (str)
+#' @param level : level of model for Kneser-ney smoothing, one of ('highest','higher')
+#'
+#' @return assign @model.name to Data Table 
+#'
 model.learn <- function(Ngrams.count, model.name, level='higher') {
     
     N = length(unlist(strsplit(names(Ngrams.count[1]), " ")))
@@ -29,15 +38,14 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
         setkey(model, first)
         
         assign(model.name, model, envir = .GlobalEnv)
-        
         return()
     }
     
-    range = if (level=='highest') list(1:(N-1)) else list(2:(N-1))
+    range = if (level=='highest') -N else c(-1,-N)
                                                 
     model[, ':=' (
         first = sapply(
-            lapply(range, function(x) lapply(split.words, "[", x))[[1]], 
+            lapply(split.words, "[", range), 
             function(x) paste(x, collapse = " ")),
         last = sapply(split.words, "[", N),
         Ngrams.words = NULL
@@ -57,8 +65,10 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
         unique.Ngram.count <- nrow(model)
     }
     
-    n.1 <- model[Ngrams.count==1,.N]
-    n.2 <- model[Ngrams.count==2,.N*2]
+    n.1 <- model[Ngrams.count==2,.N]
+    if (n.1 == 0) n.1 <- 1
+    n.2 <- model[Ngrams.count==3,.N*2]
+    if (n.2 == 0) n.2 <- 1
     D <- n.1/(n.1+2*n.2)
     
     if (level == 'higher') {
@@ -88,15 +98,19 @@ model.learn <- function(Ngrams.count, model.name, level='higher') {
     assign(model.name, model, envir = .GlobalEnv)
 }
 
-model.get.row <- function(model, NGram) {
-    return(model[first==NGram])
-}
 
-model.evaluate <- function(model, corpus) {
-    time
-    accuracy1
-    accuracy2
-    accuracy3
-    accuracyUnknown
-    perplexity
+#' model.get.row
+#'
+#' @param model : ngram model in Data table with index "first" 
+#' @param NGram : ngram to find (string)
+#'
+#' @return Data Table with @Ngram as first in each row
+#' 
+model.get.row <- function(model, NGrams, ret.na=F) {
+    if (ret.na){
+        return(model[NGrams])
+    } else {
+        return(model[NGrams, nomatch = 0L])
+    }
+    
 }

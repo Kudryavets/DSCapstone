@@ -1,5 +1,6 @@
 require(RUnit)
-source("./project/main/ngrams.R")
+source("main/ngrams.R")
+
 
 ngrams.tests <- function() {
     
